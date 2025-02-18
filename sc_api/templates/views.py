@@ -112,3 +112,20 @@ def evaluate_task(request):
     
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON format"}, status=400)
+    
+@csrf_exempt
+def batch_ratings(request):
+    if request.method != 'POST':
+        return HttpResponse("Only POST allowed", status=400)
+    try:
+        data = json.loads(request.body)
+        if "ratings" not in data:
+            return JsonResponse({"error": f"Missing field: ratings"}, status=400)
+        for rating_pair in data["ratings"]:
+            task = Task.objects.get(id=rating_pair["id"])
+            task_data = {"satisfaction": rating_pair["satisfaction"]}
+            modify_task(task, task_data)
+        return HttpResponse("OK", status=200)
+    
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON format"}, status=400)

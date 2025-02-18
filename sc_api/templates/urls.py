@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/delete_task', views.delete_task),
     path('api/get_tasks', views.get_tasks),
     path('api/evaluate_task', views.evaluate_task),
+    path('api/review', views.batch_ratings),
 ]

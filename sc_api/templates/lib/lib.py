@@ -29,7 +29,7 @@ def modify_task(task, data):
     task.save()
 
 def fetch_tasks(userID, start, end):
-    return Task.objects.filter(owner=userID, start_time__gte=start, start_time__lte=end)
+    return Task.objects.filter(owner=userID, start_time__gte=start, start_time__lte=end).order_by("start_time")
 
 def fetch_overlap(userID, start, end):
     return Task.objects.filter(Q(owner=userID), Q(start_time__gte=start, start_time__lte=end) | Q(end_time__gte=start, end_time__lte=end) | Q(start_time__lte=start, end_time__gte=end))
