@@ -14,8 +14,6 @@ dataset["Type"] = dataset["Type"].map({"Exercise": 1, "Relaxation": 2})
 dataset = pd.get_dummies(dataset, columns=["Time", "Type"])
 dataset = dataset.astype(int)
 
-print(dataset.tail())
-
 train_features = dataset.copy()
 train_labels = train_features.pop("Satisfaction")
 

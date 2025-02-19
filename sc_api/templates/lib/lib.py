@@ -1,6 +1,11 @@
 from ..models import *
 from datetime import datetime, time
 from django.db.models import Q
+import tensorflow as tf
+import os
+
+model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ml_model.keras')
+model = tf.keras.models.load_model(model_path)
 
 def create_task(data, tentative=False):
     if tentative:
@@ -39,7 +44,8 @@ def create_suggestion(task, modifier):
     suggestion.task = task
     suggestion.new_start = task.start_time
     suggestion.new_end = task.end_time
-    modifier(suggestion)
+    rule = modifier(suggestion, task)
+    suggestion.rule = rule
     suggestion.save()
     return suggestion
 
@@ -95,6 +101,29 @@ def invert_times(times):
         inverted.append([times[-1][1], time(23, 59)])
     
     return inverted
+
+def categorize_time(task):
+    if task.start_time.hour < 12:
+        return 0
+    if task.start_time.hour < 16:
+        return 1
+    if task.start_time.hour < 20:
+        return 2
+    return 3
+
+def change_to_time_of_day(suggestion, identifier):
+    length = suggestion.new_end - suggestion.new_start
+    if identifier == 0:
+        suggestion.new_start = datetime.combine(suggestion.new_start.date(), time(8))
+    if identifier == 1:
+        suggestion.new_start = datetime.combine(suggestion.new_start.date(), time(12))
+    if identifier == 2:
+        suggestion.new_start = datetime.combine(suggestion.new_start.date(), time(16))
+    if identifier == 3:
+        suggestion.new_start = datetime.combine(suggestion.new_start.date(), time(20))
+    suggestion.new_end = suggestion.new_start + length
+        
+                
 
 from .rules import rules
 
