@@ -23,6 +23,7 @@ def new_task(request):
             if field not in data:
                 return JsonResponse({"error": f"Missing field: {field}"}, status=400)
         task = create_task(data)
+
         return JsonResponse({"task": serializers.serialize("json", [task])}, status=200)
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON format"}, status=400)
